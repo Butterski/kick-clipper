@@ -78,3 +78,5 @@ node_modules/
 # Optional: Compiled binary for this specific project
 kick-clipper
 kick-clipper.exe
+
+proxies.txt
