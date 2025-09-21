@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  kick-clipper:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kick-clipper-bot
+    restart: unless-stopped
+    
+    # Environment variables for configuration
+    environment:
+      - TZ=UTC
+    
+    # Volume mounts for configuration
+    volumes:
+      - ./proxies.txt:/app/proxies.txt:ro
+      - ./logs:/app/logs
+    
+    # Override default command with your specific settings
+    command: [
+      "-clip", "${CLIP_ID:-8qb7ne}",
+      "-workers", "${WORKERS:-100}", 
+      "-delay", "${DELAY:-5}",
+      "-time", "${RUNTIME:-300}",
+      "-target", "${TARGET:-10000}"
+    ]
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1.0'
+        reservations:
+          memory: 256M
+          cpus: '0.5'
+    
+    # Network settings
+    network_mode: bridge
+    
+    # Logging configuration
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# Optional: Development override service
+  kick-clipper-dev:
+    extends:
+      service: kick-clipper
+    profiles:
+      - dev
+    volumes:
+      - ./proxies.txt:/app/proxies.txt:ro
+    command: [
+      "-clip", "8qb7ne",
+      "-workers", "10",
+      "-delay", "2", 
+      "-time", "60"
+    ]
+
+volumes:
+  logs:
+    driver: local
