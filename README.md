@@ -58,13 +58,35 @@ docker-compose up --build
 ./kick-clipper.exe [OPTIONS]
 
 Options:
-  -clip string     Clip ID or full URL (required)
-  -workers int     Number of concurrent bots (default: 100)
-  -delay int       Delay between requests in seconds (default: 5)  
-  -time int        Runtime in seconds (default: 300)
-  -target int      Target view count (default: 10000)
-  -proxy           Enable proxy rotation (default: true)
+  -clip string         Clip ID or full URL (required)
+  -workers int         Number of concurrent bots (default: 100)
+  -delay int           Delay between requests in seconds (default: 5)  
+  -time int            Runtime in seconds (default: 300)
+  -target int          Target view count (default: 10000)
+  --proxy-file string  Path to proxy file (default: "proxies.txt")
+  --no-proxy           Run without proxies (uses your IP only)
 ```
+
+### 🌐 Proxy Configuration
+
+**With Proxies (Default):**
+```bash
+./kick-clipper.exe -clip <CLIP_ID> -workers 100 -delay 5 -time 300
+# Uses proxies from proxies.txt file
+```
+
+**Without Proxies:**
+```bash
+./kick-clipper.exe --no-proxy -clip <CLIP_ID> -workers 50 -delay 10 -time 300
+# All requests from your IP - use fewer workers and longer delays
+```
+
+**Custom Proxy File:**
+```bash
+./kick-clipper.exe --proxy-file custom-proxies.txt -clip <CLIP_ID> -workers 100
+```
+
+> **⚠️ Important**: When using `--no-proxy`, reduce worker count (10-50) and increase delays (10+ seconds) to avoid being rate-limited or blocked.
 
 ### 📊 Dashboard Features
 - Real-time view statistics
@@ -98,6 +120,9 @@ Options:
    ```bash
    # Override environment variables
    CLIP_ID=your_clip_id WORKERS=200 docker-compose up
+   
+   # Run without proxies (modify docker-compose.yml command section)
+   # Add --no-proxy to the command array
    ```
 
 ### Manual Docker Build
@@ -106,12 +131,18 @@ Options:
 # Build image
 docker build -t kick-clipper .
 
-# Run container
+# Run container with proxies
 docker run -d \
   --name kick-clipper-bot \
   -v $(pwd)/proxies.txt:/app/proxies.txt:ro \
   kick-clipper \
   -clip your_clip_id -workers 100 -delay 5 -time 300
+
+# Run container WITHOUT proxies
+docker run -d \
+  --name kick-clipper-bot-no-proxy \
+  kick-clipper \
+  --no-proxy -clip your_clip_id -workers 50 -delay 10 -time 300
 ```
 
 ## 🛠️ Manual Installation
